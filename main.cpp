@@ -4,6 +4,7 @@
 #include <ctime>
 #include <string>
 #include <thread> //for time.sleep() like thing
+#include <ncurses.h>                  
 
 using namespace std;
 
@@ -15,7 +16,32 @@ class pomo {
   public:
     void count_down(int sesh_len_min);
     int get_current_time_in_mins();
+    void draw_tui();
 };
+
+void pomo::draw_tui() {
+  
+  initscr();
+
+  int xmax, ymax;
+
+  getmaxyx(stdscr, ymax, xmax);
+
+  WINDOW *heading_win = newwin(ymax, xmax, 0, 0);
+  refresh();
+  
+  box(heading_win, 0, 0);
+  mvwprintw(heading_win, 1,xmax/2, "Nirmal's PoMo");
+  wrefresh(heading_win);
+
+
+
+  getch();
+  endwin();
+
+
+}
+
 
 void pomo::count_down(int sesh_len_min) {
   
@@ -48,7 +74,7 @@ int pomo::get_current_time_in_mins() {
              //till here -> tt gives number of seconds passed from unix epoch
   st = localtime(&tt); //convert to local time   
   //return asctime(st); //return local time as string                   
-  return st->tm_min;
+  return (st->tm_min);
                       
 }
 
@@ -56,8 +82,12 @@ int main() {
 
   pomo p;
 
-  p.count_down(1);
+  //p.count_down(1);
+  //
   
+  p.draw_tui();
+
+
   return 0;
 }
 
