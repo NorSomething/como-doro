@@ -22,6 +22,8 @@ class pomo {
 void pomo::draw_tui() {
   
   initscr();
+  noecho();
+  cbreak();
 
   int xmax, ymax;
 
@@ -34,6 +36,19 @@ void pomo::draw_tui() {
   mvwprintw(heading_win, 1,xmax/2, "Nirmal's PoMo");
   wrefresh(heading_win);
 
+  mvwprintw(heading_win, 2, 1, "Enter length of the pomodoro session to start (in minutes) : ");
+  wrefresh(heading_win);
+
+  echo(); //temp echo open so that user can enter minutes
+
+  char input[10];
+  wgetnstr(heading_win, input, 9); //reads upto 9 characters
+  
+  int sesh_len = stoi(input); //converts to int
+                              
+  noecho(); //temp echo close
+  
+  count_down(sesh_len);
 
 
   getch();
@@ -49,10 +64,10 @@ void pomo::count_down(int sesh_len_min) {
   //int target_min = current_min + sesh_len_min; ->> this breaks after 59 like no circular flow back to 0th min
   int elapsed = 0;
   
-  cout << "Pomo session for " << sesh_len_min << " minute has started.\n";
+  cout << "\n Pomo session for " << sesh_len_min << " minutes has started.\n";
 
   while(elapsed < sesh_len_min) {
-    cout << ("pomo sesh underway\n");
+    //cout << ("pomo sesh underway\n");
 
     this_thread::sleep_for(chrono::seconds(1));
 
@@ -63,7 +78,7 @@ void pomo::count_down(int sesh_len_min) {
     }
   }
 
-  cout << "sesh over...\n";
+  //cout << "sesh over...\n";
 
 }
 
