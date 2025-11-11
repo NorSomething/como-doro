@@ -14,7 +14,7 @@ class pomo {
     string sesh_name;
 
   public:
-    int count_down(int sesh_len_min, WINDOW *heading_win);
+    void count_down(int sesh_len_min, WINDOW *heading_win);
     int get_current_time_in_mins();
     void draw_tui();
 };
@@ -59,7 +59,7 @@ void pomo::draw_tui() {
 }
 
 
-int pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
+void pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
   
   int current_min = get_current_time_in_mins();
   //int target_min = current_min + sesh_len_min; ->> this breaks after 59 like no circular flow back to 0th min
@@ -70,27 +70,15 @@ int pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
   mvwprintw(heading_win, 3, 1, "Pomo Session has started.");
   wrefresh(heading_win);
 
-  while(elapsed < sesh_len_min) {
-    //cout << ("pomo sesh underway\n");
-
-    this_thread::sleep_for(chrono::seconds(1));
-
-    int current_sesh_min = get_current_time_in_mins();
-
-    if (current_sesh_min != current_min) {
-      current_min = current_sesh_min;
-      elapsed++;
-    }
-  }
-
-  mvwprintw(heading_win, 3, 1, "Pomo Session has ended.");
-  wrefresh(heading_win);
-
-  if (elapsed == sesh_len_min) {
-    return 1;
-  }
+  auto start = chrono::steady_clock::now(); //gets current time  
+  auto duration = chrono::minutes(sesh_len_min); //converts user mins input into a chrono object 
   
-  return 0;
+  while (chrono::steady_clock::now() - start < duration) {
+    this_thread::sleep_for(chrono::seconds(1));
+  }
+
+  mvwprintw(heading_win, 4, 1, "Pomo Session has ended.");
+  wrefresh(heading_win);
 
 }
 
