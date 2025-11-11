@@ -14,7 +14,7 @@ class pomo {
     string sesh_name;
 
   public:
-    void count_down(int sesh_len_min);
+    int count_down(int sesh_len_min, WINDOW *heading_win);
     int get_current_time_in_mins();
     void draw_tui();
 };
@@ -33,7 +33,7 @@ void pomo::draw_tui() {
   refresh();
   
   box(heading_win, 0, 0);
-  mvwprintw(heading_win, 1,xmax/2, "Nirmal's PoMo");
+  mvwprintw(heading_win, 1,xmax/2-13, "Nirmal's PoMo");
   wrefresh(heading_win);
 
   mvwprintw(heading_win, 2, 1, "Enter length of the pomodoro session to start (in minutes) : ");
@@ -45,10 +45,11 @@ void pomo::draw_tui() {
   wgetnstr(heading_win, input, 9); //reads upto 9 characters
   
   int sesh_len = stoi(input); //converts to int
-                              
+  
+
   noecho(); //temp echo close
   
-  count_down(sesh_len);
+  count_down(sesh_len, heading_win);
 
 
   getch();
@@ -58,13 +59,16 @@ void pomo::draw_tui() {
 }
 
 
-void pomo::count_down(int sesh_len_min) {
+int pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
   
   int current_min = get_current_time_in_mins();
   //int target_min = current_min + sesh_len_min; ->> this breaks after 59 like no circular flow back to 0th min
   int elapsed = 0;
   
-  cout << "\n Pomo session for " << sesh_len_min << " minutes has started.\n";
+  //cout << "\n  Pomo session for " << sesh_len_min << " minutes has started.\n";
+  
+  mvwprintw(heading_win, 3, 1, "Pomo Session has started.");
+  wrefresh(heading_win);
 
   while(elapsed < sesh_len_min) {
     //cout << ("pomo sesh underway\n");
@@ -72,13 +76,21 @@ void pomo::count_down(int sesh_len_min) {
     this_thread::sleep_for(chrono::seconds(1));
 
     int current_sesh_min = get_current_time_in_mins();
+
     if (current_sesh_min != current_min) {
       current_min = current_sesh_min;
       elapsed++;
     }
   }
 
-  //cout << "sesh over...\n";
+  mvwprintw(heading_win, 3, 1, "Pomo Session has ended.");
+  wrefresh(heading_win);
+
+  if (elapsed == sesh_len_min) {
+    return 1;
+  }
+  
+  return 0;
 
 }
 
