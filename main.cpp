@@ -65,19 +65,24 @@ void pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
   //int target_min = current_min + sesh_len_min; ->> this breaks after 59 like no circular flow back to 0th min
   int elapsed = 0;
   
-  //cout << "\n  Pomo session for " << sesh_len_min << " minutes has started.\n";
   
-  mvwprintw(heading_win, 3, 1, "Pomo Session has started.");
+  mvwprintw(heading_win, 3, 1, "Pomo Session for %d minutes has started.", sesh_len_min);
   wrefresh(heading_win);
 
-  auto start = chrono::steady_clock::now(); //gets current time  
+  auto start = chrono::steady_clock::now(); //gets current time as a chrono object 
   auto duration = chrono::minutes(sesh_len_min); //converts user mins input into a chrono object 
   
   while (chrono::steady_clock::now() - start < duration) {
+    auto mins_left = chrono::steady_clock::now() - start;
+    int seconds = chrono::duration_cast<chrono::seconds>(mins_left).count(); //duration_cast (seconds) -> converts mis_left into seconds
+                                                                             //count -> spits out integer value of it
+    mvwprintw(heading_win, 4, 1, "Time left : ");
+    mvwprintw(heading_win, 4, 14, "%d", sesh_len_min - (seconds/60));
+    wrefresh(heading_win);
     this_thread::sleep_for(chrono::seconds(1));
   }
 
-  mvwprintw(heading_win, 4, 1, "Pomo Session has ended.");
+  mvwprintw(heading_win, 5, 1, "Pomo Session has ended.");
   wrefresh(heading_win);
 
 }
