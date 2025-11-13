@@ -13,19 +13,20 @@ class pomo {
     int time_studied_secs;
     string sesh_name;
 
+    int xmax, ymax;
+
   public:
     void count_down(int sesh_len_min, WINDOW *heading_win);
     int get_current_time_in_mins();
-    void draw_tui();
+    void draw_main_tui(int choice);
+    int draw_menu_driven_tui();
 };
 
-void pomo::draw_tui() {
+void pomo::draw_main_tui(int choice) {
   
   initscr();
   noecho();
   cbreak();
-
-  int xmax, ymax;
 
   getmaxyx(stdscr, ymax, xmax);
 
@@ -46,11 +47,12 @@ void pomo::draw_tui() {
   
   int sesh_len = stoi(input); //converts to int
   
-
   noecho(); //temp echo close
+            //
+  if (choice == 1)
+    sesh_len == 25;
   
   count_down(sesh_len, heading_win);
-
 
   getch();
   endwin();
@@ -58,13 +60,43 @@ void pomo::draw_tui() {
 
 }
 
+int pomo::draw_menu_driven_tui() {
+  
+  initscr();
+  noecho();
+  cbreak();
+  
+  getmaxyx(stdscr, ymax, xmax);
+  WINDOW *menu_win = newwin(ymax, xmax, 0, 0);
+  refresh();
+
+  box(menu_win, 0, 0);
+
+  mvwprintw(menu_win, 1,1, "Welcome to Nirmal's PomoDoro!");
+  mvwprintw(menu_win, 2,1, "Press 1 for default 25 minutes Pomo. \t Press 2 for custom Pomo timer.");
+  wrefresh(menu_win);
+
+  echo();
+  
+  char input[10];
+  wgetnstr(menu_win, input, 9);
+
+  int choice = stoi(input);
+
+  noecho(); 
+
+  return choice;
+
+  getch();
+  endwin();
+
+}
 
 void pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
   
   int current_min = get_current_time_in_mins();
   //int target_min = current_min + sesh_len_min; ->> this breaks after 59 like no circular flow back to 0th min
   int elapsed = 0;
-  
   
   mvwprintw(heading_win, 3, 1, "Pomo Session for %d minutes has started.", sesh_len_min);
   wrefresh(heading_win);
@@ -104,8 +136,8 @@ int main() {
 
   //p.count_down(1);
   //
-  
-  p.draw_tui();
+  p.draw_menu_driven_tui(); 
+  p.draw_main_tui(0);
 
 
   return 0;
