@@ -12,7 +12,6 @@ class pomo {
   private:
     int time_studied_secs;
     string sesh_name;
-
     int xmax, ymax;
 
   public:
@@ -20,6 +19,8 @@ class pomo {
     int get_current_time_in_mins();
     void draw_main_tui(int choice);
     int draw_menu_driven_tui();
+
+    int choice;
 };
 
 void pomo::draw_main_tui(int choice) {
@@ -37,6 +38,11 @@ void pomo::draw_main_tui(int choice) {
   mvwprintw(heading_win, 1,xmax/2-13, "Nirmal's PoMo");
   wrefresh(heading_win);
 
+
+  int sesh_len;
+
+  if (choice == 2) {
+
   mvwprintw(heading_win, 2, 1, "Enter length of the pomodoro session to start (in minutes) : ");
   wrefresh(heading_win);
 
@@ -45,13 +51,19 @@ void pomo::draw_main_tui(int choice) {
   char input[10];
   wgetnstr(heading_win, input, 9); //reads upto 9 characters
   
-  int sesh_len = stoi(input); //converts to int
+  sesh_len = stoi(input); //converts to int
   
-  noecho(); //temp echo close
+  noecho();  //temp echo close
+  }
             //
-  if (choice == 1)
-    sesh_len == 25;
-  
+  else if (choice == 1) {
+    sesh_len = 25;
+  } 
+
+  else {
+    mvwprintw(heading_win, 10, 1, "Invalid Choice.");
+  }
+
   count_down(sesh_len, heading_win);
 
   getch();
@@ -73,7 +85,7 @@ int pomo::draw_menu_driven_tui() {
   box(menu_win, 0, 0);
 
   mvwprintw(menu_win, 1,1, "Welcome to Nirmal's PomoDoro!");
-  mvwprintw(menu_win, 2,1, "Press 1 for default 25 minutes Pomo. \t Press 2 for custom Pomo timer.");
+  mvwprintw(menu_win, 2,1, "Press 1 for default 25 minutes Pomo. \t\t\t Press 2 for custom Pomo timer.");
   wrefresh(menu_win);
 
   echo();
@@ -85,10 +97,10 @@ int pomo::draw_menu_driven_tui() {
 
   noecho(); 
 
+  endwin();
+
   return choice;
 
-  getch();
-  endwin();
 
 }
 
@@ -97,7 +109,7 @@ void pomo::count_down(int sesh_len_min, WINDOW *heading_win) {
   int current_min = get_current_time_in_mins();
   //int target_min = current_min + sesh_len_min; ->> this breaks after 59 like no circular flow back to 0th min
   int elapsed = 0;
-  
+
   mvwprintw(heading_win, 3, 1, "Pomo Session for %d minutes has started.", sesh_len_min);
   wrefresh(heading_win);
 
@@ -133,11 +145,9 @@ int pomo::get_current_time_in_mins() {
 int main() {
 
   pomo p;
-
-  //p.count_down(1);
-  //
-  p.draw_menu_driven_tui(); 
-  p.draw_main_tui(0);
+  
+  p.choice = p.draw_menu_driven_tui();
+  p.draw_main_tui(p.choice);
 
 
   return 0;
